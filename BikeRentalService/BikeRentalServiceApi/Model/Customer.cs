@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace BikeRentalServiceApi.Model
 {
+    public enum Gender { Male, Female, Unknown }
     public class Customer
     {
         [Key]
         public int CustomerId { get; set; }
-        public enum Sex { Male, Female, Unknown }
+  
+        [Required]
+        public Gender Gender { get; set; }
 
         [Required][MaxLength(50)]
         public string Firstname { get; set; }
@@ -33,5 +36,7 @@ namespace BikeRentalServiceApi.Model
         [Required]
         [MaxLength(75)]
         public string Town { get; set; }
+
+        public List<Rental> Rentals { get; set; }
     }
 }

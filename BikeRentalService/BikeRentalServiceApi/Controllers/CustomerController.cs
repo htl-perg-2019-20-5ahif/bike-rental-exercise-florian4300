@@ -13,70 +13,138 @@ namespace BikeRentalServiceApi.Controllers
     public class CustomerController : ControllerBase
     {
 
-        private readonly ILogger<CustomerController> _logger;
-        private static List<Customer> customers = new List<Customer>();
+        private readonly IDataAccess dal;
+        private readonly BikeRentalContext context = new BikeRentalContext();
 
-        public CustomerController(ILogger<CustomerController> logger)
+        public CustomerController( IDataAccess _dal)
         {
-            _logger = logger;
+            dal = _dal;
         }
 
         [HttpGet]
         public ActionResult GetCustomers([FromQuery] string filter)
         {
-            if(filter != null)
+            using (dal)
             {
-                var filteredCustomers = customers.FindAll(c => c.Lastname.Contains(filter));
-                if (filteredCustomers.Any())
-                {
-                    return Ok(filteredCustomers);
-                } else
-                {
-                    return NotFound();
-                }
+                var customers = dal.GetCustomers(filter);
+                return Ok(customers);
+
             }
-            return Ok(customers);
+            //if (filter != null)
+            //{
+            //    var filteredCustomers = context.Customers.ToList().FindAll(c => c.Lastname.ToLower().Contains(filter.ToLower()));
+            //    if (filteredCustomers.Any())
+            //    {
+            //        return Ok(filteredCustomers);
+            //    }
+            //    else
+            //    {
+            //        return NotFound();
+            //    }
+            //}
+            //return Ok(context.Customers);
         }
         [HttpPost]
         public ActionResult AddCustomer([FromBody] Customer customer)
         {
-            return Ok(customer);
+            using (dal)
+            {
+                try
+                {
+                    var id = dal.AddCustomer(customer);
+                    return Ok(id);
+                }
+                catch (ArgumentException ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+            }
+
+            //context.Customers.Add(customer);
+            //context.SaveChanges();
+            //return Ok(customer);
         }
         [HttpPut]
         [Route("{customerId}")]
-        public ActionResult UpdateCustomer(int customerId)
+        public ActionResult UpdateCustomer(int customerId, [FromBody] Customer customer)
         {
-            if(customerId >= customers.Count)
+            using (dal)
             {
-                return BadRequest();
+                var updatedCustomer = dal.UpdateCustomer(customerId, customer);
+                if(updatedCustomer == null)
+                {
+                    return BadRequest();
+                } else
+                {
+                    return Ok(customer);
+                }
             }
-            var c = customers.Find(c => c.CustomerId == customerId);
-            return Ok(c);
+            //var customerFromDb = context.Customers.ToList().Find(c => c.CustomerId == customerId);
+            //if (customerFromDb == null)
+            //{
+            //    return BadRequest();
+            //}
+            //customerFromDb.Birthday = customer.Birthday;
+            //customerFromDb.Firstname = customer.Firstname;
+            //customerFromDb.Lastname = customer.Lastname;
+            //customerFromDb.HouseNumber = customer.HouseNumber;
+            //customerFromDb.Street = customer.Street;
+            //customerFromDb.Town = customer.Town;
+            //customerFromDb.ZipCode = customer.ZipCode;
+            //context.Customers.Update(customerFromDb);
+            //await context.SaveChangesAsync();
+            //return Ok(customerFromDb);
         }
         [HttpDelete]
         [Route("{customerId}")]
         public ActionResult DeleteCustomer(int customerId)
         {
-            if (customerId >= customers.Count)
+            using(dal)
             {
-                return BadRequest();
+                var deletedCustomer = dal.DeleteCustomer(customerId);
+                if(deletedCustomer == null)
+                {
+                    return BadRequest();
+                } else
+                {
+                    return Ok(deletedCustomer);
+                }
             }
-            var c = customers.Find(c => c.CustomerId == customerId);
-            customers.Remove(c);
-            return Ok(c);
+            //if (context.Customers.ToList().Find(c => c.CustomerId == customerId) == null)
+            //{
+            //    return BadRequest();
+            //}
+            //var c = context.Customers.ToList().Find(c => c.CustomerId == customerId);
+            //context.Customers.Remove(c);
+            //await context.SaveChangesAsync();
+            //return Ok(c);
         }
 
         [HttpGet]
         [Route("{customerId}")]
-        public ActionResult GetRentals(int customerId)
+        public ActionResult GetRentalsOfCustomer(int customerId)
         {
-            if (customerId >= customers.Count)
+            using(dal)
             {
-                return BadRequest();
+                var rentals = dal.GetRentalsOfCustomer(customerId);
+                if(rentals == null)
+                {
+                    return BadRequest();
+                } 
+                else
+                {
+                    return Ok(rentals);
+                }
             }
-            var c = customers.Find(c => c.CustomerId == customerId);
-            
-            return Ok(c);
+
+            //if (context.Customers.ToList().Find(c => c.CustomerId == customerId) == null)
+            //{
+            //    return BadRequest();
+            //}
+            //var c = context.Customers.ToList().Find(c => c.CustomerId == customerId);
+
+            //return Ok(c.Rentals);
         }
 
     }
