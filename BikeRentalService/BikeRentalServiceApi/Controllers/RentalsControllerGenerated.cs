@@ -1,12 +1,10 @@
-﻿using System;
+﻿using BikeRentalServiceApi.Model;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BikeRentalServiceApi;
-using BikeRentalServiceApi.Model;
 
 namespace BikeRentalServiceApi.Controllers
 {
@@ -93,12 +91,12 @@ namespace BikeRentalServiceApi.Controllers
         public async Task<ActionResult<Rental>> StopRental(int rentalId)
         {
             var rental = this.GetRentalById(rentalId);
-            if(rental == null)
+            if (rental == null)
             {
                 return NotFound();
             }
             rental.RentalEnd = System.DateTime.Now;
-            rental.TotalAmount = CalculateTotalPrice(rental); 
+            rental.TotalAmount = CalculateTotalPrice(rental);
             context.Rentals.Update(rental);
             await context.SaveChangesAsync();
 
@@ -114,11 +112,11 @@ namespace BikeRentalServiceApi.Controllers
             {
                 return NotFound();
             }
-            if(rental.RentalEnd == null)
+            if (rental.RentalEnd == null)
             {
                 return BadRequest();
             }
-            if(rental.TotalAmount > 0)
+            if (rental.TotalAmount > 0)
             {
                 return BadRequest();
             }
@@ -134,9 +132,9 @@ namespace BikeRentalServiceApi.Controllers
         {
             List<UnpaidRental> unpaidRentals = new List<UnpaidRental>();
             var rentals = context.Rentals;
-            foreach(var rental in rentals)
+            foreach (var rental in rentals)
             {
-                if(rental.TotalAmount > 0 && rental.RentalEnd != null && rental.Paid == false)
+                if (rental.TotalAmount > 0 && rental.RentalEnd != null && rental.Paid == false)
                 {
                     UnpaidRental ur = new UnpaidRental();
                     ur.CustomerId = rental.Customer.CustomerId;
@@ -161,23 +159,23 @@ namespace BikeRentalServiceApi.Controllers
         private double CalculateTotalPrice(Rental rental)
         {
             double totalCost = 0.0;
-            if(rental.RentalBegin != null && rental.RentalEnd != null)
+            if (rental.RentalBegin != null && rental.RentalEnd != null)
             {
-                TimeSpan ts = (TimeSpan) (rental.RentalBegin - rental.RentalEnd);
-                if(ts.TotalMinutes <= 15)
+                TimeSpan ts = (TimeSpan)(rental.RentalBegin - rental.RentalEnd);
+                if (ts.TotalMinutes <= 15)
                 {
                     return 0;
                 }
                 ts = ts.Subtract(TimeSpan.FromHours(1));
                 totalCost += rental.Bike.RentalPriceFirstHour;
-                while(ts.TotalMinutes > 0)
+                while (ts.TotalMinutes > 0)
                 {
                     ts = ts.Subtract(TimeSpan.FromHours(1));
                     totalCost += rental.Bike.RentalPriceAdditionalHours;
                 }
-                
+
             }
-            
+
             return totalCost;
 
         }

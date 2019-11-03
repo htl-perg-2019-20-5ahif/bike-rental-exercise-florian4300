@@ -1,22 +1,20 @@
 ﻿using BikeRentalServiceApi;
 using BikeRentalServiceApi.Model;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace BikeRental.Test.TestCustomers
 {
-    
+
     public class AddCustomer
     {
         [Fact]
         public async Task AddCustomerCorrect()
         {
-            using(var dal = new DataAccess())
+            using (var dal = new DataAccess())
             {
-                
+
                 dal.InitDatabase();
                 Customer c = new Customer();
                 c.Birthday = System.DateTime.Now;

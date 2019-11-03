@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BikeRentalServiceApi.Model
 {
@@ -26,7 +22,7 @@ namespace BikeRentalServiceApi.Model
         public DateTime LastServiceDate { get; set; }
 
         [Required]
-        [Range(0.0,Double.MaxValue)]
+        [Range(0.0, Double.MaxValue)]
         [RegularExpression(@"\d+(\.\d{1,2})?", ErrorMessage = "Invalid price")]
 
         public double RentalPriceFirstHour { get; set; }
@@ -35,7 +31,7 @@ namespace BikeRentalServiceApi.Model
         [Range(1.0, Double.MaxValue)]
         [RegularExpression(@"\d+(\.\d{1,2})?", ErrorMessage = "Invalid price")]
         public double RentalPriceAdditionalHours { get; set; }
-         
+
         [Required]
         public BikeCategory BikeCategory { get; set; }
         public Rental Rental { get; set; }

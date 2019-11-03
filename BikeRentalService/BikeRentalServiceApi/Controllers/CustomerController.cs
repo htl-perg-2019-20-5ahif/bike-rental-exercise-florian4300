@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BikeRentalServiceApi.Model;
+﻿using BikeRentalServiceApi.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using System;
 
 namespace BikeRentalServiceApi.Controllers
 {
@@ -16,7 +12,7 @@ namespace BikeRentalServiceApi.Controllers
         private readonly IDataAccess dal;
         private readonly BikeRentalContext context = new BikeRentalContext();
 
-        public CustomerController( IDataAccess _dal)
+        public CustomerController(IDataAccess _dal)
         {
             dal = _dal;
         }
@@ -72,10 +68,11 @@ namespace BikeRentalServiceApi.Controllers
             using (dal)
             {
                 var updatedCustomer = dal.UpdateCustomer(customerId, customer);
-                if(updatedCustomer == null)
+                if (updatedCustomer == null)
                 {
                     return BadRequest();
-                } else
+                }
+                else
                 {
                     return Ok(customer);
                 }
@@ -100,13 +97,14 @@ namespace BikeRentalServiceApi.Controllers
         [Route("{customerId}")]
         public ActionResult DeleteCustomer(int customerId)
         {
-            using(dal)
+            using (dal)
             {
                 var deletedCustomer = dal.DeleteCustomer(customerId);
-                if(deletedCustomer == null)
+                if (deletedCustomer == null)
                 {
                     return BadRequest();
-                } else
+                }
+                else
                 {
                     return Ok(deletedCustomer);
                 }
@@ -125,13 +123,13 @@ namespace BikeRentalServiceApi.Controllers
         [Route("{customerId}")]
         public ActionResult GetRentalsOfCustomer(int customerId)
         {
-            using(dal)
+            using (dal)
             {
                 var rentals = dal.GetRentalsOfCustomer(customerId);
-                if(rentals == null)
+                if (rentals == null)
                 {
                     return BadRequest();
-                } 
+                }
                 else
                 {
                     return Ok(rentals);

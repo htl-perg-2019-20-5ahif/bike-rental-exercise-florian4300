@@ -1,8 +1,5 @@
 ﻿using BikeRentalServiceApi;
 using BikeRentalServiceApi.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -106,7 +103,7 @@ namespace BikeRental.Test.TestRental
                 var rental = await dal.StartRental(customerId, bikeId);
 
                 rental = await dal.StopRental(rental.RentalId, rental.RentalBegin.AddMinutes(150));
-                Assert.True(rental.TotalAmount == (b.RentalPriceFirstHour + 2*b.RentalPriceAdditionalHours));
+                Assert.True(rental.TotalAmount == (b.RentalPriceFirstHour + 2 * b.RentalPriceAdditionalHours));
 
             }
 

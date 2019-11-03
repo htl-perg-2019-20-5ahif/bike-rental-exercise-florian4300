@@ -1,11 +1,7 @@
 ﻿using BikeRentalServiceApi;
 using BikeRentalServiceApi.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
-using static BikeRentalServiceApi.Exceptions;
 
 namespace BikeRental.Test.TestCustomers
 {
@@ -26,7 +22,7 @@ namespace BikeRental.Test.TestCustomers
                 c.ZipCode = "1234";
                 await dal.AddCustomer(c);
                 c.Firstname = "Florian";
-                var number = await dal.UpdateCustomer(1,c);
+                var number = await dal.UpdateCustomer(1, c);
                 Assert.True(number >= 0);
             }
         }

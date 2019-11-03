@@ -1,10 +1,8 @@
-﻿using System;
+﻿using BikeRentalServiceApi.Model;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BikeRentalServiceApi.Model;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BikeRentalServiceApi.Controllers
 {
@@ -26,14 +24,16 @@ namespace BikeRentalServiceApi.Controllers
             if (filter.Equals("priceFirstHour"))
             {
                 availableBikes = context.Bikes.ToList().FindAll(b => b.Rental == null).OrderBy(b => b.RentalPriceFirstHour).ToList();
-            } else if (filter.Equals("priceAdditionalHours"))
+            }
+            else if (filter.Equals("priceAdditionalHours"))
             {
                 availableBikes = context.Bikes.ToList().FindAll(b => b.Rental == null).OrderBy(b => b.RentalPriceAdditionalHours).ToList(); ;
             }
             else if (filter.Equals("purchaseData"))
             {
                 availableBikes = context.Bikes.ToList().FindAll(b => b.Rental == null).OrderBy(b => b.RentalPriceAdditionalHours).ToList(); ;
-            } else
+            }
+            else
             {
                 availableBikes = context.Bikes.ToList().FindAll(b => b.Rental == null);
             }
@@ -43,7 +43,7 @@ namespace BikeRentalServiceApi.Controllers
         // POST: api/Bikes
         [HttpPost]
         public async Task<ActionResult> AddBike([FromBody] Bike bike)
-        
+
         {
             await context.Bikes.AddAsync(bike);
             await context.SaveChangesAsync();
@@ -54,12 +54,12 @@ namespace BikeRentalServiceApi.Controllers
         [HttpPut("{bikeId}")]
         public async Task<ActionResult> UpdateBike(int bikeId, [FromBody] Bike bike)
         {
-            var bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
+            Bike bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
             if (bikeFromDb == null)
             {
                 return BadRequest();
             }
-            
+
             bikeFromDb.Brand = bike.Brand;
             bikeFromDb.LastServiceDate = bike.LastServiceDate;
             bikeFromDb.Notes = bike.Notes;
@@ -80,7 +80,7 @@ namespace BikeRentalServiceApi.Controllers
             {
                 return BadRequest();
             }
-            var b = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
+            Bike b = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
             context.Bikes.Remove(b);
             await context.SaveChangesAsync();
             return Ok(b);

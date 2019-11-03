@@ -16,7 +16,7 @@ namespace BikeRentalServiceApi
         {
             this.context = new BikeRentalContext();
         }
-        public List<Customer> GetCustomers( string filter)
+        public List<Customer> GetCustomers(string filter)
         {
             if (filter != null)
             {
@@ -33,9 +33,9 @@ namespace BikeRentalServiceApi
             return (context.Customers.ToList());
         }
 
-        public async Task<int> AddCustomer( Customer customer)
+        public async Task<int> AddCustomer(Customer customer)
         {
-            if(customer.Lastname == null || customer.Firstname == null ||customer.Birthday == null || customer.Street == null || customer.Town == null || customer.ZipCode == null)
+            if (customer.Lastname == null || customer.Firstname == null || customer.Birthday == null || customer.Street == null || customer.Town == null || customer.ZipCode == null)
             {
                 throw new ArgumentException();
             }
@@ -50,7 +50,7 @@ namespace BikeRentalServiceApi
             var customerFromDb = context.Customers.ToList().Find(c => c.CustomerId == customerId);
             if (customerFromDb == null)
             {
-                throw new CustomerNotExistingException ();
+                throw new CustomerNotExistingException();
             }
             customerFromDb.Birthday = customer.Birthday;
             customerFromDb.Firstname = customer.Firstname;
@@ -107,7 +107,7 @@ namespace BikeRentalServiceApi
             }
             return (availableBikes);
         }
-        public async Task<int> AddBike( Bike bike)
+        public async Task<int> AddBike(Bike bike)
 
         {
             await context.Bikes.AddAsync(bike);
@@ -116,7 +116,7 @@ namespace BikeRentalServiceApi
         }
 
 
-        public async Task<int> UpdateBike(int bikeId,  Bike bike)
+        public async Task<int> UpdateBike(int bikeId, Bike bike)
         {
             var bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
             if (bikeFromDb == null)
@@ -195,12 +195,12 @@ namespace BikeRentalServiceApi
             {
                 throw new RentalNotExistingException();
             }
-            if(rental.RentalEnd != null)
+            if (rental.RentalEnd != null)
             {
                 throw new RentalAlreadyEndedException();
             }
             rental.RentalEnd = End;
-            if(rental.RentalBegin.CompareTo(rental.RentalEnd) > 0)
+            if (rental.RentalBegin.CompareTo(rental.RentalEnd) > 0)
             {
                 throw new ArgumentException();
             }

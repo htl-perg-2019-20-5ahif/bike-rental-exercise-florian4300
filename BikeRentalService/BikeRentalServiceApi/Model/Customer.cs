@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BikeRentalServiceApi.Model
 {
@@ -11,11 +9,12 @@ namespace BikeRentalServiceApi.Model
     {
         [Key]
         public int CustomerId { get; set; }
-  
+
         [Required]
         public Gender Gender { get; set; }
 
-        [Required][MaxLength(50)]
+        [Required]
+        [MaxLength(50)]
         public string Firstname { get; set; }
 
         [Required]
@@ -24,7 +23,8 @@ namespace BikeRentalServiceApi.Model
 
         [Required]
         public DateTime Birthday { get; set; }
-        [Required][MaxLength(75)]
+        [Required]
+        [MaxLength(75)]
         public string Street { get; set; }
 
         [MaxLength(10)]
