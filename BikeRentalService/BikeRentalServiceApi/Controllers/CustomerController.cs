@@ -1,6 +1,8 @@
 ﻿using BikeRentalServiceApi.Model;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
+using static BikeRentalServiceApi.Exceptions;
 
 namespace BikeRentalServiceApi.Controllers
 {
@@ -10,11 +12,11 @@ namespace BikeRentalServiceApi.Controllers
     {
 
         private readonly IDataAccess dal;
-        private readonly BikeRentalContext context = new BikeRentalContext();
 
         public CustomerController(IDataAccess _dal)
         {
             dal = _dal;
+            this.dal.InitDatabase();
         }
 
         [HttpGet]
@@ -26,28 +28,24 @@ namespace BikeRentalServiceApi.Controllers
                 return Ok(customers);
 
             }
-            //if (filter != null)
-            //{
-            //    var filteredCustomers = context.Customers.ToList().FindAll(c => c.Lastname.ToLower().Contains(filter.ToLower()));
-            //    if (filteredCustomers.Any())
-            //    {
-            //        return Ok(filteredCustomers);
-            //    }
-            //    else
-            //    {
-            //        return NotFound();
-            //    }
-            //}
-            //return Ok(context.Customers);
         }
         [HttpPost]
-        public ActionResult AddCustomer([FromBody] Customer customer)
+        public async Task<ActionResult<int>> AddCustomer([FromBody] ApiCustomer customer)
         {
             using (dal)
             {
                 try
                 {
-                    var id = dal.AddCustomer(customer);
+                    Customer c = new Customer();
+                    c.Birthday = customer.Birthday;
+                    c.Firstname = customer.Firstname;
+                    c.Lastname = customer.Lastname;
+                    c.HouseNumber = customer.HouseNumber;
+                    c.Street = customer.Street;
+                    c.Town = customer.Town;
+                    c.ZipCode = customer.ZipCode;
+
+                    var id = await dal.AddCustomer(c);
                     return Ok(id);
                 }
                 catch (ArgumentException ex)
@@ -56,26 +54,38 @@ namespace BikeRentalServiceApi.Controllers
                 }
 
             }
-
-            //context.Customers.Add(customer);
-            //context.SaveChanges();
-            //return Ok(customer);
         }
         [HttpPut]
         [Route("{customerId}")]
-        public ActionResult UpdateCustomer(int customerId, [FromBody] Customer customer)
+        public async Task<ActionResult<int>> UpdateCustomer(int customerId, [FromBody] ApiCustomer customer)
         {
             using (dal)
             {
-                var updatedCustomer = dal.UpdateCustomer(customerId, customer);
-                if (updatedCustomer == null)
+                try
+                {
+                    Customer c = new Customer();
+                    c.Gender = customer.Gender;
+                    c.Birthday = customer.Birthday;
+                    c.Firstname = customer.Firstname;
+                    c.Lastname = customer.Lastname;
+                    c.HouseNumber = customer.HouseNumber;
+                    c.Street = customer.Street;
+                    c.Town = customer.Town;
+                    c.ZipCode = customer.ZipCode;
+                    var updatedCustomerId = await dal.UpdateCustomer(customerId, c);
+                    if (updatedCustomerId <= 0)
+                    {
+                        return BadRequest();
+                    }
+                    else
+                    {
+                        return Ok(updatedCustomerId);
+                    }
+                }catch(CustomerNotExistingException ex)
                 {
                     return BadRequest();
                 }
-                else
-                {
-                    return Ok(customer);
-                }
+
             }
             //var customerFromDb = context.Customers.ToList().Find(c => c.CustomerId == customerId);
             //if (customerFromDb == null)
@@ -95,19 +105,26 @@ namespace BikeRentalServiceApi.Controllers
         }
         [HttpDelete]
         [Route("{customerId}")]
-        public ActionResult DeleteCustomer(int customerId)
+        public async Task<ActionResult<int>> DeleteCustomer(int customerId)
         {
             using (dal)
             {
-                var deletedCustomer = dal.DeleteCustomer(customerId);
-                if (deletedCustomer == null)
+                try
+                {
+                    var deletedCustomer = await dal.DeleteCustomer(customerId);
+                    if (deletedCustomer <= 0)
+                    {
+                        return BadRequest();
+                    }
+                    else
+                    {
+                        return Ok(deletedCustomer);
+                    }
+                } catch(CustomerNotExistingException ex)
                 {
                     return BadRequest();
                 }
-                else
-                {
-                    return Ok(deletedCustomer);
-                }
+
             }
             //if (context.Customers.ToList().Find(c => c.CustomerId == customerId) == null)
             //{
@@ -120,20 +137,21 @@ namespace BikeRentalServiceApi.Controllers
         }
 
         [HttpGet]
-        [Route("{customerId}")]
+        [Route("{customerId}/rentals")]
         public ActionResult GetRentalsOfCustomer(int customerId)
         {
             using (dal)
             {
-                var rentals = dal.GetRentalsOfCustomer(customerId);
-                if (rentals == null)
+                try
+                {
+                    var rentals = dal.GetRentalsOfCustomer(customerId);
+                    return Ok(rentals);
+                }
+                catch (CustomerNotExistingException)
                 {
                     return BadRequest();
                 }
-                else
-                {
-                    return Ok(rentals);
-                }
+
             }
 
             //if (context.Customers.ToList().Find(c => c.CustomerId == customerId) == null)

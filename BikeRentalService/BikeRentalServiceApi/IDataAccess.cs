@@ -7,6 +7,7 @@ namespace BikeRentalServiceApi
 {
     public interface IDataAccess : IDisposable
     {
+        public void InitDatabase();
         public List<Customer> GetCustomers(string filter);
 
         public Task<int> AddCustomer(Customer customer);
@@ -14,21 +15,14 @@ namespace BikeRentalServiceApi
 
         public Task<int> UpdateCustomer(int customerId, Customer customer);
 
-        public Task<Customer> DeleteCustomer(int customerId);
+        public Task<int> DeleteCustomer(int customerId);
         public List<Rental> GetRentalsOfCustomer(int customerId);
         public List<Bike> GetBikes(string filter);
         public Task<int> AddBike(Bike bike);
 
         public Task<int> UpdateBike(int bikeId, Bike bike);
 
-        public Task<Bike> DeleteBike(int bikeId);
-        // GET: api/Rentals
-        public IEnumerable<Rental> GetRentals();
-
-
-        public Task<Rental> GetRental(int id);
-
-        // PUT: api/Rentals/5
+        public Task<int> DeleteBike(int bikeId);
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
 
@@ -43,7 +37,7 @@ namespace BikeRentalServiceApi
 
         public Task<Rental> payRental(int rentalId);
 
-        public List<UnpaidRental> GetUnpaid(int id);
+        public List<UnpaidRental> GetUnpaid();
 
 
 

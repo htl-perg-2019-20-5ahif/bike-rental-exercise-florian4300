@@ -53,6 +53,32 @@ namespace BikeRentalServiceApi
             public TotalAmountNotGreaterThanZeroException() { }
         }
 
+        public class BikeInRentalException : Exception
+        {
+            public BikeInRentalException(string message) : base(message) { }
+
+            public BikeInRentalException(string message, Exception innerException) : base(message, innerException) { }
+
+            public BikeInRentalException() { }
+        }
+
+        public class BikeAlreadyInRentalException : Exception
+        {
+            public BikeAlreadyInRentalException(string message) : base(message) { }
+
+            public BikeAlreadyInRentalException(string message, Exception innerException) : base(message, innerException) { }
+
+            public BikeAlreadyInRentalException() { }
+        }
+        public class CustomerAlreadyInRentalException : Exception
+        {
+            public CustomerAlreadyInRentalException(string message) : base(message) { }
+
+            public CustomerAlreadyInRentalException(string message, Exception innerException) : base(message, innerException) { }
+
+            public CustomerAlreadyInRentalException() { }
+        }
+
 
 
     }

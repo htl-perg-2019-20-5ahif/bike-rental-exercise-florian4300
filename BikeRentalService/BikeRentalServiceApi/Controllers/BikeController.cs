@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static BikeRentalServiceApi.Exceptions;
 
 namespace BikeRentalServiceApi.Controllers
 {
@@ -10,80 +11,91 @@ namespace BikeRentalServiceApi.Controllers
     [ApiController]
     public class BikeController : ControllerBase
     {
-        private readonly BikeRentalContext context;
+        private readonly IDataAccess dal;
 
-        public BikeController(BikeRentalContext _context)
+        public BikeController(IDataAccess _dal)
         {
-            context = _context;
+            dal = _dal;
+            this.dal.InitDatabase();
         }
-        // GET: api/Bikes
+        // get all bikes with an optional filter
         [HttpGet]
-        public ActionResult GetBikes([FromQuery] string filter)
+        public ActionResult<List<Bike>> GetBikes([FromQuery] string filter)
         {
-            List<Bike> availableBikes;
-            if (filter.Equals("priceFirstHour"))
+            using (dal)
             {
-                availableBikes = context.Bikes.ToList().FindAll(b => b.Rental == null).OrderBy(b => b.RentalPriceFirstHour).ToList();
+                if(filter == null)
+                {
+                    filter = "";
+                }
+                var bikes = dal.GetBikes(filter);
+                return Ok(bikes);
             }
-            else if (filter.Equals("priceAdditionalHours"))
-            {
-                availableBikes = context.Bikes.ToList().FindAll(b => b.Rental == null).OrderBy(b => b.RentalPriceAdditionalHours).ToList(); ;
-            }
-            else if (filter.Equals("purchaseData"))
-            {
-                availableBikes = context.Bikes.ToList().FindAll(b => b.Rental == null).OrderBy(b => b.RentalPriceAdditionalHours).ToList(); ;
-            }
-            else
-            {
-                availableBikes = context.Bikes.ToList().FindAll(b => b.Rental == null);
-            }
-            return Ok(availableBikes);
         }
 
         // POST: api/Bikes
+        // add a Bike
         [HttpPost]
-        public async Task<ActionResult> AddBike([FromBody] Bike bike)
+        public async Task<ActionResult<int>> AddBike([FromBody] Bike bike)
 
         {
-            await context.Bikes.AddAsync(bike);
-            await context.SaveChangesAsync();
-            return Ok(bike);
+            using (dal)
+            {
+                var bikeId = await dal.AddBike(bike);
+                if(bikeId <= 0)
+                {
+                    return BadRequest();
+                }
+                return Ok(bikeId);
+            }
         }
 
         // PUT: api/Bikes/5
+        // update a specific identified with an Id
         [HttpPut("{bikeId}")]
-        public async Task<ActionResult> UpdateBike(int bikeId, [FromBody] Bike bike)
+        public async Task<ActionResult<int>> UpdateBike(int bikeId, [FromBody] Bike bike)
         {
-            Bike bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
-            if (bikeFromDb == null)
+            using(dal)
             {
-                return BadRequest();
-            }
+                try
+                {
+                    var resultBikeId = await dal.UpdateBike(bikeId, bike);
+                    if (resultBikeId <= 0)
+                    {
+                        return BadRequest();
+                    }
+                    return Ok(resultBikeId);
+                }
+                catch(BikeNotExistingException ex)
+                {
+                    return BadRequest();
+                }
 
-            bikeFromDb.Brand = bike.Brand;
-            bikeFromDb.LastServiceDate = bike.LastServiceDate;
-            bikeFromDb.Notes = bike.Notes;
-            bikeFromDb.PurchaseDate = bike.PurchaseDate;
-            bikeFromDb.RentalPriceAdditionalHours = bike.RentalPriceAdditionalHours;
-            bikeFromDb.RentalPriceFirstHour = bike.RentalPriceFirstHour;
-            context.Update(bikeFromDb);
-            await context.SaveChangesAsync();
-            return Ok(bikeFromDb);
+            }
 
         }
 
         // DELETE: api/Bikes/5
+        // Delete a Bike specified with an Id
         [HttpDelete("{bikeId}")]
-        public async Task<ActionResult> Delete(int bikeId)
+        public async Task<ActionResult<int>> DeleteBike(int bikeId)
         {
-            if (context.Bikes.ToList().Find(b => b.BikeId == bikeId) == null)
+            using (dal)
             {
-                return BadRequest();
+                try
+                {
+                    var id = await dal.DeleteBike(bikeId);
+                    return Ok(id);
+                }
+                catch(BikeNotExistingException ex)
+                {
+                    return BadRequest();
+                }catch(BikeInRentalException ex)
+                {
+                    return BadRequest();
+                }
+
             }
-            Bike b = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
-            context.Bikes.Remove(b);
-            await context.SaveChangesAsync();
-            return Ok(b);
         }
     }
 }
