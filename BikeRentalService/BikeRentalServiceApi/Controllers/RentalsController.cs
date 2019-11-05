@@ -1,9 +1,7 @@
 ﻿using BikeRentalServiceApi.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using static BikeRentalServiceApi.Exceptions;
 
@@ -18,7 +16,7 @@ namespace BikeRentalServiceApi.Controllers
         public RentalsController(IDataAccess _dal)
         {
             dal = _dal;
-            this.dal.InitDatabase();
+            dal.InitDatabase();
         }
 
         // POST: api/Rentals
@@ -32,19 +30,22 @@ namespace BikeRentalServiceApi.Controllers
             {
                 try
                 {
-                    var rental = await dal.StartRental(ids.CustomerId, ids.BikeId);
-                    return Ok((RentalApi) rental);
-                } catch(CustomerNotExistingException ex)
+                    Rental rental = await dal.StartRental(ids.CustomerId, ids.BikeId);
+                    return Ok((RentalApi)rental);
+                }
+                catch (CustomerNotExistingException)
                 {
                     return BadRequest();
                 }
-                catch(BikeNotExistingException ex)
+                catch (BikeNotExistingException)
                 {
                     return BadRequest();
-                } catch(BikeAlreadyInRentalException ex)
+                }
+                catch (BikeAlreadyInRentalException)
                 {
                     return BadRequest();
-                } catch( CustomerAlreadyInRentalException ex)
+                }
+                catch (CustomerAlreadyInRentalException)
                 {
                     return BadRequest();
                 }
@@ -59,19 +60,22 @@ namespace BikeRentalServiceApi.Controllers
             {
                 try
                 {
-                    var rental = await dal.StopRental(rentalId, End);
+                    Rental rental = await dal.StopRental(rentalId, End);
                     return Ok((RentalApi)rental);
-                } catch (RentalNotExistingException ex)
-                {
-                    return BadRequest();
-                } catch (RentalAlreadyEndedException ex)
-                {
-                    return BadRequest();
-                } catch (ArgumentException)
+                }
+                catch (RentalNotExistingException)
                 {
                     return BadRequest();
                 }
-                
+                catch (RentalAlreadyEndedException)
+                {
+                    return BadRequest();
+                }
+                catch (ArgumentException)
+                {
+                    return BadRequest();
+                }
+
             }
         }
 
@@ -83,14 +87,14 @@ namespace BikeRentalServiceApi.Controllers
             {
                 try
                 {
-                    var rental = await dal.payRental(rentalId);
-                    return Ok((RentalApi) rental);
+                    Rental rental = await dal.payRental(rentalId);
+                    return Ok((RentalApi)rental);
                 }
-                catch (RentalNotExistingException ex)
+                catch (RentalNotExistingException)
                 {
                     return BadRequest();
                 }
-                catch (RentalNotEndedException ex)
+                catch (RentalNotEndedException)
                 {
                     return BadRequest();
                 }
@@ -107,7 +111,7 @@ namespace BikeRentalServiceApi.Controllers
         {
             using (dal)
             {
-                var unpaidRentals = dal.GetUnpaid();
+                List<UnpaidRental> unpaidRentals = dal.GetUnpaid();
                 return Ok(unpaidRentals);
             }
 

@@ -23,7 +23,7 @@ namespace BikeRentalServiceApi.Model
 
         public DateTime? RentalEnd { get; set; }
 
-        [Range(0.0, Double.MaxValue)]
+        [Range(0.0, double.MaxValue)]
         [RegularExpression(@"\d+(\.\d{1,2})?", ErrorMessage = "Invalid price")]
         public double TotalAmount { get; set; }
 
@@ -70,7 +70,7 @@ namespace BikeRentalServiceApi.Model
 
         public DateTime? RentalEnd { get; set; }
 
-        [Range(0.0, Double.MaxValue)]
+        [Range(0.0, double.MaxValue)]
         [RegularExpression(@"\d+(\.\d{1,2})?", ErrorMessage = "Invalid price")]
         public double TotalAmount { get; set; }
 
@@ -79,14 +79,16 @@ namespace BikeRentalServiceApi.Model
 
         public static explicit operator RentalApi(Rental r)
         {
-            RentalApi rapi = new RentalApi();
-            rapi.RentalId = r.RentalId;
-            rapi.BikeId = r.BikeId;
-            rapi.CustomerId = r.CustomerId;
-            rapi.Paid = r.Paid;
-            rapi.RentalBegin = r.RentalBegin;
-            rapi.RentalEnd = r.RentalEnd;
-            rapi.TotalAmount = r.TotalAmount;
+            RentalApi rapi = new RentalApi
+            {
+                RentalId = r.RentalId,
+                BikeId = r.BikeId,
+                CustomerId = r.CustomerId,
+                Paid = r.Paid,
+                RentalBegin = r.RentalBegin,
+                RentalEnd = r.RentalEnd,
+                TotalAmount = r.TotalAmount
+            };
             return rapi;
         }
     }

@@ -1,7 +1,6 @@
 ﻿using BikeRentalServiceApi.Model;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using static BikeRentalServiceApi.Exceptions;
 
@@ -16,7 +15,7 @@ namespace BikeRentalServiceApi.Controllers
         public BikeController(IDataAccess _dal)
         {
             dal = _dal;
-            this.dal.InitDatabase();
+            dal.InitDatabase();
         }
         // get all bikes with an optional filter
         [HttpGet]
@@ -24,11 +23,11 @@ namespace BikeRentalServiceApi.Controllers
         {
             using (dal)
             {
-                if(filter == null)
+                if (filter == null)
                 {
                     filter = "";
                 }
-                var bikes = dal.GetBikes(filter);
+                List<Bike> bikes = dal.GetBikes(filter);
                 return Ok(bikes);
             }
         }
@@ -41,8 +40,8 @@ namespace BikeRentalServiceApi.Controllers
         {
             using (dal)
             {
-                var bikeId = await dal.AddBike(bike);
-                if(bikeId <= 0)
+                int bikeId = await dal.AddBike(bike);
+                if (bikeId <= 0)
                 {
                     return BadRequest();
                 }
@@ -55,18 +54,18 @@ namespace BikeRentalServiceApi.Controllers
         [HttpPut("{bikeId}")]
         public async Task<ActionResult<int>> UpdateBike(int bikeId, [FromBody] Bike bike)
         {
-            using(dal)
+            using (dal)
             {
                 try
                 {
-                    var resultBikeId = await dal.UpdateBike(bikeId, bike);
+                    int resultBikeId = await dal.UpdateBike(bikeId, bike);
                     if (resultBikeId <= 0)
                     {
                         return BadRequest();
                     }
                     return Ok(resultBikeId);
                 }
-                catch(BikeNotExistingException ex)
+                catch (BikeNotExistingException)
                 {
                     return BadRequest();
                 }
@@ -84,13 +83,14 @@ namespace BikeRentalServiceApi.Controllers
             {
                 try
                 {
-                    var id = await dal.DeleteBike(bikeId);
+                    int id = await dal.DeleteBike(bikeId);
                     return Ok(id);
                 }
-                catch(BikeNotExistingException ex)
+                catch (BikeNotExistingException)
                 {
                     return BadRequest();
-                }catch(BikeInRentalException ex)
+                }
+                catch (BikeInRentalException)
                 {
                     return BadRequest();
                 }

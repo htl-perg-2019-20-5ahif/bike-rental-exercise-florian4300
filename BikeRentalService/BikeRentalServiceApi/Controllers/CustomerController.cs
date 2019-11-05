@@ -16,7 +16,7 @@ namespace BikeRentalServiceApi.Controllers
         public CustomerController(IDataAccess _dal)
         {
             dal = _dal;
-            this.dal.InitDatabase();
+            dal.InitDatabase();
         }
 
         [HttpGet]
@@ -24,7 +24,7 @@ namespace BikeRentalServiceApi.Controllers
         {
             using (dal)
             {
-                var customers = dal.GetCustomers(filter);
+                System.Collections.Generic.List<Customer> customers = dal.GetCustomers(filter);
                 return Ok(customers);
 
             }
@@ -36,16 +36,18 @@ namespace BikeRentalServiceApi.Controllers
             {
                 try
                 {
-                    Customer c = new Customer();
-                    c.Birthday = customer.Birthday;
-                    c.Firstname = customer.Firstname;
-                    c.Lastname = customer.Lastname;
-                    c.HouseNumber = customer.HouseNumber;
-                    c.Street = customer.Street;
-                    c.Town = customer.Town;
-                    c.ZipCode = customer.ZipCode;
+                    Customer c = new Customer
+                    {
+                        Birthday = customer.Birthday,
+                        Firstname = customer.Firstname,
+                        Lastname = customer.Lastname,
+                        HouseNumber = customer.HouseNumber,
+                        Street = customer.Street,
+                        Town = customer.Town,
+                        ZipCode = customer.ZipCode
+                    };
 
-                    var id = await dal.AddCustomer(c);
+                    int id = await dal.AddCustomer(c);
                     return Ok(id);
                 }
                 catch (ArgumentException ex)
@@ -63,16 +65,18 @@ namespace BikeRentalServiceApi.Controllers
             {
                 try
                 {
-                    Customer c = new Customer();
-                    c.Gender = customer.Gender;
-                    c.Birthday = customer.Birthday;
-                    c.Firstname = customer.Firstname;
-                    c.Lastname = customer.Lastname;
-                    c.HouseNumber = customer.HouseNumber;
-                    c.Street = customer.Street;
-                    c.Town = customer.Town;
-                    c.ZipCode = customer.ZipCode;
-                    var updatedCustomerId = await dal.UpdateCustomer(customerId, c);
+                    Customer c = new Customer
+                    {
+                        Gender = customer.Gender,
+                        Birthday = customer.Birthday,
+                        Firstname = customer.Firstname,
+                        Lastname = customer.Lastname,
+                        HouseNumber = customer.HouseNumber,
+                        Street = customer.Street,
+                        Town = customer.Town,
+                        ZipCode = customer.ZipCode
+                    };
+                    int updatedCustomerId = await dal.UpdateCustomer(customerId, c);
                     if (updatedCustomerId <= 0)
                     {
                         return BadRequest();
@@ -81,7 +85,8 @@ namespace BikeRentalServiceApi.Controllers
                     {
                         return Ok(updatedCustomerId);
                     }
-                }catch(CustomerNotExistingException ex)
+                }
+                catch (CustomerNotExistingException)
                 {
                     return BadRequest();
                 }
@@ -111,7 +116,7 @@ namespace BikeRentalServiceApi.Controllers
             {
                 try
                 {
-                    var deletedCustomer = await dal.DeleteCustomer(customerId);
+                    int deletedCustomer = await dal.DeleteCustomer(customerId);
                     if (deletedCustomer <= 0)
                     {
                         return BadRequest();
@@ -120,7 +125,8 @@ namespace BikeRentalServiceApi.Controllers
                     {
                         return Ok(deletedCustomer);
                     }
-                } catch(CustomerNotExistingException ex)
+                }
+                catch (CustomerNotExistingException)
                 {
                     return BadRequest();
                 }
@@ -144,7 +150,7 @@ namespace BikeRentalServiceApi.Controllers
             {
                 try
                 {
-                    var rentals = dal.GetRentalsOfCustomer(customerId);
+                    System.Collections.Generic.List<Rental> rentals = dal.GetRentalsOfCustomer(customerId);
                     return Ok(rentals);
                 }
                 catch (CustomerNotExistingException)

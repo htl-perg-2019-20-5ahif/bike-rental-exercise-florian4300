@@ -1,5 +1,4 @@
 ﻿using BikeRentalServiceApi.Model;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,14 +16,14 @@ namespace BikeRentalServiceApi
 
         public void InitDatabase()
         {
-            this.context = new BikeRentalContext();
+            context = new BikeRentalContext();
 
         }
         public List<Customer> GetCustomers(string filter)
         {
             if (filter != null)
             {
-                var filteredCustomers = context.Customers.ToList().FindAll(c => c.Lastname.ToLower().Contains(filter.ToLower()));
+                List<Customer> filteredCustomers = context.Customers.ToList().FindAll(c => c.Lastname.ToLower().Contains(filter.ToLower()));
                 if (filteredCustomers.Any())
                 {
                     return (filteredCustomers);
@@ -51,7 +50,7 @@ namespace BikeRentalServiceApi
 
         public async Task<int> UpdateCustomer(int customerId, Customer customer)
         {
-            var customerFromDb = context.Customers.ToList().Find(c => c.CustomerId == customerId);
+            Customer customerFromDb = context.Customers.ToList().Find(c => c.CustomerId == customerId);
             if (customerFromDb == null)
             {
                 throw new CustomerNotExistingException();
@@ -75,11 +74,11 @@ namespace BikeRentalServiceApi
             {
                 throw new CustomerNotExistingException();
             }
-            var c = context.Customers.ToList().Find(c => c.CustomerId == customerId);
-            var rentals = GetRentalsOfCustomer(c.CustomerId);
-            foreach(var r in rentals)
+            Customer c = context.Customers.ToList().Find(c => c.CustomerId == customerId);
+            List<Rental> rentals = GetRentalsOfCustomer(c.CustomerId);
+            foreach (Rental r in rentals)
             {
-                var bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == r.BikeId);
+                Bike bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == r.BikeId);
                 if (bikeFromDb == null)
                 {
                     throw new BikeNotExistingException();
@@ -127,7 +126,7 @@ namespace BikeRentalServiceApi
 
         public async Task<int> UpdateBike(int bikeId, Bike bike)
         {
-            var bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
+            Bike bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
             if (bikeFromDb == null)
             {
                 throw new BikeNotExistingException();
@@ -151,8 +150,8 @@ namespace BikeRentalServiceApi
             {
                 throw new BikeNotExistingException();
             }
-            var b = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
-            if(b.RentalId > 0)
+            Bike b = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
+            if (b.RentalId > 0)
             {
                 throw new BikeInRentalException();
             }
@@ -162,30 +161,32 @@ namespace BikeRentalServiceApi
         }
         public async Task<Rental> StartRental(int customerId, int bikeId)
         {
-            var customerFromDb = context.Customers.ToList().Find(c => c.CustomerId == customerId);
+            Customer customerFromDb = context.Customers.ToList().Find(c => c.CustomerId == customerId);
             if (customerFromDb == null)
             {
                 throw new CustomerNotExistingException();
             }
-            var bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
+            Bike bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
             if (bikeFromDb == null)
             {
                 throw new BikeNotExistingException();
             }
-            if(bikeFromDb.RentalId > 0)
+            if (bikeFromDb.RentalId > 0)
             {
                 throw new BikeAlreadyInRentalException();
             }
-             if (GetRentalsOfCustomer(customerFromDb.CustomerId).Count > 0)
-             {
-               throw new CustomerAlreadyInRentalException();
-             } 
-            
-            Rental rental = new Rental();
-            rental.CustomerId = customerId;
-            rental.BikeId = bikeId;
-            rental.RentalBegin = System.DateTime.Now;
-            rental.RentalEnd = null;
+            if (GetRentalsOfCustomer(customerFromDb.CustomerId).Count > 0)
+            {
+                throw new CustomerAlreadyInRentalException();
+            }
+
+            Rental rental = new Rental
+            {
+                CustomerId = customerId,
+                BikeId = bikeId,
+                RentalBegin = System.DateTime.Now,
+                RentalEnd = null
+            };
             context.Rentals.Add(rental);
             await context.SaveChangesAsync();
             bikeFromDb.RentalId = rental.RentalId;
@@ -198,7 +199,7 @@ namespace BikeRentalServiceApi
 
         public async Task<Rental> StopRental(int rentalId, DateTime End)
         {
-            var rental = this.GetRentalById(rentalId);
+            Rental rental = GetRentalById(rentalId);
             if (rental == null)
             {
                 throw new RentalNotExistingException();
@@ -214,8 +215,8 @@ namespace BikeRentalServiceApi
             }
             rental.TotalAmount = CalculateTotalPrice(rental);
 
-            var bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == rental.BikeId);
-             if (bikeFromDb != null)
+            Bike bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == rental.BikeId);
+            if (bikeFromDb != null)
             {
                 bikeFromDb.RentalId = 0;
             }
@@ -223,14 +224,14 @@ namespace BikeRentalServiceApi
             context.Bikes.Update(bikeFromDb);
             context.Rentals.Update(rental);
             await context.SaveChangesAsync();
-            
+
             return rental;
         }
 
 
         public async Task<Rental> payRental(int rentalId)
         {
-            var rental = this.GetRentalById(rentalId);
+            Rental rental = GetRentalById(rentalId);
             if (rental == null)
             {
                 throw new RentalNotExistingException();
@@ -253,23 +254,25 @@ namespace BikeRentalServiceApi
         public List<UnpaidRental> GetUnpaid()
         {
             List<UnpaidRental> unpaidRentals = new List<UnpaidRental>();
-            var rentals = context.Rentals;
-            foreach (var rental in rentals.ToList())
+            Microsoft.EntityFrameworkCore.DbSet<Rental> rentals = context.Rentals;
+            foreach (Rental rental in rentals.ToList())
             {
                 if (rental.TotalAmount > 0 && rental.RentalEnd != null && rental.Paid == false)
                 {
-                    var customerFromDb = context.Customers.ToList().Find(c => c.CustomerId == rental.CustomerId);
+                    Customer customerFromDb = context.Customers.ToList().Find(c => c.CustomerId == rental.CustomerId);
                     if (customerFromDb == null)
                     {
                         throw new CustomerNotExistingException();
                     }
-                    UnpaidRental ur = new UnpaidRental();
-                    ur.CustomerId = customerFromDb.CustomerId;
-                    ur.Firstname = customerFromDb.Firstname;
-                    ur.Lastname = customerFromDb.Lastname;
-                    ur.RentalId = rental.RentalId;
-                    ur.RentalBegin = rental.RentalBegin;
-                    ur.RentalEnd = rental.RentalEnd;
+                    UnpaidRental ur = new UnpaidRental
+                    {
+                        CustomerId = customerFromDb.CustomerId,
+                        Firstname = customerFromDb.Firstname,
+                        Lastname = customerFromDb.Lastname,
+                        RentalId = rental.RentalId,
+                        RentalBegin = rental.RentalBegin,
+                        RentalEnd = rental.RentalEnd
+                    };
                     unpaidRentals.Add(ur);
                 }
             }
@@ -286,7 +289,7 @@ namespace BikeRentalServiceApi
         }
         public double CalculateTotalPrice(Rental rental)
         {
-            var bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == rental.BikeId);
+            Bike bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == rental.BikeId);
             if (bikeFromDb == null)
             {
                 throw new BikeNotExistingException();
@@ -319,9 +322,9 @@ namespace BikeRentalServiceApi
                 throw new CustomerNotExistingException();
             }
             List<Rental> rentalsOfCustomer = new List<Rental>();
-            foreach(var rental in context.Rentals)
+            foreach (Rental rental in context.Rentals)
             {
-                if(rental.CustomerId == customerId)
+                if (rental.CustomerId == customerId)
                 {
                     rentalsOfCustomer.Add(rental);
                 }
@@ -333,7 +336,7 @@ namespace BikeRentalServiceApi
         {
             if (context != null)
             {
-                this.context.Dispose();
+                context.Dispose();
                 context = null;
             }
         }

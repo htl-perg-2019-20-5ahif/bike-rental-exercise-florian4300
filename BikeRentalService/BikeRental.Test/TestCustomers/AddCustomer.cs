@@ -12,18 +12,20 @@ namespace BikeRental.Test.TestCustomers
         [Fact]
         public async Task AddCustomerCorrect()
         {
-            using (var dal = new DataAccess())
+            using (DataAccess dal = new DataAccess())
             {
 
                 dal.InitDatabase();
-                Customer c = new Customer();
-                c.Birthday = System.DateTime.Now;
-                c.Firstname = "Max";
-                c.Lastname = "Mustermann";
-                c.Street = "MusterStreet";
-                c.Town = "MusterTown";
-                c.ZipCode = "1234";
-                var number = await dal.AddCustomer(c);
+                Customer c = new Customer
+                {
+                    Birthday = System.DateTime.Now,
+                    Firstname = "Max",
+                    Lastname = "Mustermann",
+                    Street = "MusterStreet",
+                    Town = "MusterTown",
+                    ZipCode = "1234"
+                };
+                int number = await dal.AddCustomer(c);
                 Assert.True(number >= 0);
             }
         }
@@ -31,15 +33,17 @@ namespace BikeRental.Test.TestCustomers
         [Fact]
         public async Task MissingLastname()
         {
-            using (var dal = new DataAccess())
+            using (DataAccess dal = new DataAccess())
             {
                 dal.InitDatabase();
-                Customer c = new Customer();
-                c.Birthday = System.DateTime.Now;
-                c.Firstname = "Max";
-                c.Street = "MusterStreet";
-                c.Town = "MusterTown";
-                c.ZipCode = "1234";
+                Customer c = new Customer
+                {
+                    Birthday = System.DateTime.Now,
+                    Firstname = "Max",
+                    Street = "MusterStreet",
+                    Town = "MusterTown",
+                    ZipCode = "1234"
+                };
                 await Assert.ThrowsAsync<ArgumentException>(async () => await dal.AddCustomer(c));
             }
         }
