@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BikeRentalServiceApi.Model
 {
@@ -34,6 +35,6 @@ namespace BikeRentalServiceApi.Model
 
         [Required]
         public BikeCategory BikeCategory { get; set; }
-        public Rental Rental { get; set; }
+        public int RentalId { get; set; }
     }
 }

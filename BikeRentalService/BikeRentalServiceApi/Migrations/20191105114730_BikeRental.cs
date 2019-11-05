@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BikeRentalServiceApi.Migrations
 {
@@ -19,7 +19,8 @@ namespace BikeRentalServiceApi.Migrations
                     LastServiceDate = table.Column<DateTime>(nullable: false),
                     RentalPriceFirstHour = table.Column<double>(nullable: false),
                     RentalPriceAdditionalHours = table.Column<double>(nullable: false),
-                    BikeCategory = table.Column<int>(nullable: false)
+                    BikeCategory = table.Column<int>(nullable: false),
+                    RentalId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -62,42 +63,19 @@ namespace BikeRentalServiceApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Rentals", x => x.RentalId);
-                    table.ForeignKey(
-                        name: "FK_Rentals_Bikes_BikeId",
-                        column: x => x.BikeId,
-                        principalTable: "Bikes",
-                        principalColumn: "BikeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Rentals_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerId",
-                        onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rentals_BikeId",
-                table: "Rentals",
-                column: "BikeId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rentals_CustomerId",
-                table: "Rentals",
-                column: "CustomerId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Rentals");
-
-            migrationBuilder.DropTable(
                 name: "Bikes");
 
             migrationBuilder.DropTable(
                 name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "Rentals");
         }
     }
 }

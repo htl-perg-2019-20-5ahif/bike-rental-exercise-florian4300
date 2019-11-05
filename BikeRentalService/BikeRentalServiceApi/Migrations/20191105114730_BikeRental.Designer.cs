@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BikeRentalServiceApi.Migrations
 {
     [DbContext(typeof(BikeRentalContext))]
-    [Migration("20191102221851_BikeRental")]
+    [Migration("20191105114730_BikeRental")]
     partial class BikeRental
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,6 +45,9 @@ namespace BikeRentalServiceApi.Migrations
 
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("RentalId")
+                        .HasColumnType("int");
 
                     b.Property<double>("RentalPriceAdditionalHours")
                         .HasColumnType("float");
@@ -131,27 +134,7 @@ namespace BikeRentalServiceApi.Migrations
 
                     b.HasKey("RentalId");
 
-                    b.HasIndex("BikeId")
-                        .IsUnique();
-
-                    b.HasIndex("CustomerId");
-
                     b.ToTable("Rentals");
-                });
-
-            modelBuilder.Entity("BikeRentalServiceApi.Model.Rental", b =>
-                {
-                    b.HasOne("BikeRentalServiceApi.Model.Bike", "Bike")
-                        .WithOne("Rental")
-                        .HasForeignKey("BikeRentalServiceApi.Model.Rental", "BikeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BikeRentalServiceApi.Model.Customer", "Customer")
-                        .WithMany("Rentals")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

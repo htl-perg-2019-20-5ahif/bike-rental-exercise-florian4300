@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BikeRentalServiceApi.Model
 {
@@ -37,6 +38,38 @@ namespace BikeRentalServiceApi.Model
         [MaxLength(75)]
         public string Town { get; set; }
 
-        public List<Rental> Rentals { get; set; }
+
+    }
+
+    public class ApiCustomer
+    {
+
+        [Required]
+        public Gender Gender { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string Firstname { get; set; }
+
+        [Required]
+        [MaxLength(75)]
+        public string Lastname { get; set; }
+
+        [Required]
+        public DateTime Birthday { get; set; }
+        [Required]
+        [MaxLength(75)]
+        public string Street { get; set; }
+
+        [MaxLength(10)]
+        public string HouseNumber { get; set; }
+
+        [Required]
+        [MaxLength(10)]
+        public string ZipCode { get; set; }
+        [Required]
+        [MaxLength(75)]
+        public string Town { get; set; }
+
     }
 }
