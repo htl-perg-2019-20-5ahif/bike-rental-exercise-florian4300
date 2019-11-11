@@ -16,7 +16,7 @@ namespace BikeRentalServiceApi.Model
         [Required]
         public DateTime PurchaseDate { get; set; }
 
-        [MaxLength(25)]
+        [MaxLength(1000)]
         public string Notes { get; set; }
 
         public DateTime LastServiceDate { get; set; }
