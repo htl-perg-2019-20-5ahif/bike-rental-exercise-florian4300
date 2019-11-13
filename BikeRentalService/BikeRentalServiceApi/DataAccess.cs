@@ -83,7 +83,7 @@ namespace BikeRentalServiceApi
                 {
                     throw new BikeNotExistingException();
                 }
-                bikeFromDb.RentalId = 0;
+                bikeFromDb.ActiveRentalId = 0;
             }
             await context.SaveChangesAsync();
             context.Rentals.RemoveRange(rentals);
@@ -99,19 +99,19 @@ namespace BikeRentalServiceApi
             List<Bike> availableBikes;
             if (filter.Equals("priceFirstHour"))
             {
-                availableBikes = context.Bikes.ToList().FindAll(b => b.RentalId > 0).OrderBy(b => b.RentalPriceFirstHour).ToList();
+                availableBikes = context.Bikes.ToList().FindAll(b => b.ActiveRentalId > 0).OrderBy(b => b.RentalPriceFirstHour).ToList();
             }
             else if (filter.Equals("priceAdditionalHours"))
             {
-                availableBikes = context.Bikes.ToList().FindAll(b => b.RentalId > 0).OrderBy(b => b.RentalPriceAdditionalHours).ToList(); ;
+                availableBikes = context.Bikes.ToList().FindAll(b => b.ActiveRentalId > 0).OrderBy(b => b.RentalPriceAdditionalHours).ToList(); ;
             }
             else if (filter.Equals("purchaseDate"))
             {
-                availableBikes = context.Bikes.ToList().FindAll(b => b.RentalId > 0).OrderByDescending(b => b.PurchaseDate).ToList(); ;
+                availableBikes = context.Bikes.ToList().FindAll(b => b.ActiveRentalId > 0).OrderByDescending(b => b.PurchaseDate).ToList(); ;
             }
             else
             {
-                availableBikes = context.Bikes.ToList().FindAll(b => b.RentalId <= 0);
+                availableBikes = context.Bikes.ToList().FindAll(b => b.ActiveRentalId <= 0);
             }
             return (availableBikes);
         }
@@ -151,7 +151,7 @@ namespace BikeRentalServiceApi
                 throw new BikeNotExistingException();
             }
             Bike b = context.Bikes.ToList().Find(b => b.BikeId == bikeId);
-            if (b.RentalId > 0)
+            if (b.ActiveRentalId > 0)
             {
                 throw new BikeInRentalException();
             }
@@ -171,7 +171,7 @@ namespace BikeRentalServiceApi
             {
                 throw new BikeNotExistingException();
             }
-            if (bikeFromDb.RentalId > 0)
+            if (bikeFromDb.ActiveRentalId > 0)
             {
                 throw new BikeAlreadyInRentalException();
             }
@@ -189,7 +189,7 @@ namespace BikeRentalServiceApi
             };
             context.Rentals.Add(rental);
             await context.SaveChangesAsync();
-            bikeFromDb.RentalId = rental.RentalId;
+            bikeFromDb.ActiveRentalId = rental.RentalId;
             context.Bikes.Update(bikeFromDb);
             await context.SaveChangesAsync();
 
@@ -218,9 +218,9 @@ namespace BikeRentalServiceApi
             Bike bikeFromDb = context.Bikes.ToList().Find(b => b.BikeId == rental.BikeId);
             if (bikeFromDb != null)
             {
-                bikeFromDb.RentalId = 0;
+                bikeFromDb.ActiveRentalId = 0;
             }
-            bikeFromDb.RentalId = 0;
+            bikeFromDb.ActiveRentalId = 0;
             context.Bikes.Update(bikeFromDb);
             context.Rentals.Update(rental);
             await context.SaveChangesAsync();

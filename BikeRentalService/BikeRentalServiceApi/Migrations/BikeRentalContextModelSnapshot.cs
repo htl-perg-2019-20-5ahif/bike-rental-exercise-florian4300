@@ -26,6 +26,9 @@ namespace BikeRentalServiceApi.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ActiveRentalId")
+                        .HasColumnType("int");
+
                     b.Property<int>("BikeCategory")
                         .HasColumnType("int");
 
@@ -38,14 +41,11 @@ namespace BikeRentalServiceApi.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(25)")
-                        .HasMaxLength(25);
+                        .HasColumnType("nvarchar(1000)")
+                        .HasMaxLength(1000);
 
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("RentalId")
-                        .HasColumnType("int");
 
                     b.Property<double>("RentalPriceAdditionalHours")
                         .HasColumnType("float");

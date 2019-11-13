@@ -34,6 +34,6 @@ namespace BikeRentalServiceApi.Model
 
         [Required]
         public BikeCategory BikeCategory { get; set; }
-        public int RentalId { get; set; }
+        public int ActiveRentalId { get; set; }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BikeRentalServiceApi.Migrations
 {
@@ -15,12 +15,12 @@ namespace BikeRentalServiceApi.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Brand = table.Column<string>(maxLength: 25, nullable: false),
                     PurchaseDate = table.Column<DateTime>(nullable: false),
-                    Notes = table.Column<string>(maxLength: 25, nullable: true),
+                    Notes = table.Column<string>(maxLength: 1000, nullable: true),
                     LastServiceDate = table.Column<DateTime>(nullable: false),
                     RentalPriceFirstHour = table.Column<double>(nullable: false),
                     RentalPriceAdditionalHours = table.Column<double>(nullable: false),
                     BikeCategory = table.Column<int>(nullable: false),
-                    RentalId = table.Column<int>(nullable: false)
+                    ActiveRentalId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
