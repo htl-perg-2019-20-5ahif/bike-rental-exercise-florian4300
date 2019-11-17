@@ -1,4 +1,5 @@
 ﻿using BikeRentalServiceApi.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -317,14 +318,15 @@ namespace BikeRentalServiceApi
         }
         public List<Rental> GetRentalsOfCustomer(int customerId)
         {
-            if (context.Customers.ToList().Find(c => c.CustomerId == customerId) == null)
+            var c = context.Customers.ToList().Find(c => c.CustomerId == customerId);
+            if (c == null)
             {
                 throw new CustomerNotExistingException();
             }
             List<Rental> rentalsOfCustomer = new List<Rental>();
             foreach (Rental rental in context.Rentals)
             {
-                if (rental.CustomerId == customerId)
+                if (rental.CustomerId == c.CustomerId)
                 {
                     rentalsOfCustomer.Add(rental);
                 }
